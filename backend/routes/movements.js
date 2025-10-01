@@ -13,16 +13,12 @@ const router = express.Router();
 // --- INICIO: CÓDIGO MODIFICADO PARA EXPORTAR REPORTE ---
 router.get("/export", authenticate, async (req, res) => {
     try {
-        // --- ✅ CORRECCIÓN: Esta línea faltaba ---
-        // Extrae las fechas del filtro que envía el frontend
         const { startDate, endDate } = req.query;
 
-        // Valida que las fechas existan para evitar errores
         if (!startDate || !endDate) {
             return res.status(400).json({ success: false, message: "Las fechas de inicio y fin son requeridas." });
         }
 
-        // 1. Lógica de fecha corregida (USA HORA LOCAL)
         const startOfDay = new Date(startDate + 'T00:00:00');
         const endOfDay = new Date(endDate + 'T23:59:59.999');
 
@@ -33,44 +29,42 @@ router.get("/export", authenticate, async (req, res) => {
         const movementsSnapshot = await movementsQuery.orderBy("date", "desc").get();
         const movements = movementsSnapshot.docs.map(doc => doc.data());
 
-        // 2. Creación del archivo Excel
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet(`Reporte Movimientos`);
 
         worksheet.columns = [
-            // ... (tus columnas de Excel - sin cambios aquí)
             { header: "Fecha", key: "date", width: 25 },
             { header: "SKU", key: "sku", width: 20 },
             { header: "Producto", key: "productName", width: 35 },
             { header: "Tipo", key: "type", width: 15 },
             { header: "Cantidad", key: "quantity", width: 15 },
             { header: "Motivo", key: "reason", width: 25 },
-            { header: "Usuario", key: "userEmail", width: 25 },
-            { header: "Observaciones", key: "observations", width: 40 },
+            { header: "Usuario", key: "userName", width: 25 }, // Corregido a userName
+            { header: "Observaciones", key: "observaciones", width: 40 }, // Corregido a observaciones
         ];
         worksheet.getRow(1).font = { bold: true };
 
-        // 3. Llenado seguro de las filas
+        // Llenado seguro de las filas
         movements.forEach(movement => {
             let formattedDate = "Fecha inválida";
             if (movement.date && typeof movement.date._seconds === 'number') {
                 formattedDate = new Date(movement.date._seconds * 1000).toLocaleString("es-CL");
             }
 
+            // ✅ **AQUÍ USAMOS LOS DATOS DESNORMALIZADOS**
             const rowData = {
                 date: formattedDate,
-                sku: movement.sku || "N/A",
-                productName: movement.productName || "Sin nombre",
+                sku: movement.productInfo?.sku || "N/A", // Usamos el campo anidado
+                productName: movement.productInfo?.nombre || "Sin nombre", // Usamos el campo anidado
                 type: movement.type || "Sin tipo",
                 quantity: typeof movement.quantity === 'number' ? movement.quantity : 0,
                 reason: movement.reason || "Sin motivo",
-                userEmail: movement.userEmail || "Usuario desconocido",
-                observations: movement.observations || "",
+                userName: movement.userName || "Usuario desconocido", // Corregido
+                observaciones: movement.observaciones || "", // Corregido
             };
             worksheet.addRow(rowData);
         });
 
-        // 4. Envío del archivo al navegador
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', `attachment; filename=reporte_movimientos.xlsx`);
         await workbook.xlsx.write(res);

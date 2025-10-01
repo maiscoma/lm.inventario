@@ -18,12 +18,14 @@ import SystemLogsPage from "./pages/SystemLogsPage";
 import SystemSettingsPage from "./pages/SystemSettingsPage";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import DatabasePage from "./pages/DatabasePage";
+import { SettingsProvider } from "./contexts/SettingsContext";
 
 // Configuración de rutas
 function App() {
   return (
     <AuthProvider>
       <NotificationProvider>
+      <SettingsProvider>
         <Router>
           <Routes>
             {/* Ruta pública - Login */}
@@ -89,6 +91,7 @@ function App() {
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Router>
+        </SettingsProvider>
       </NotificationProvider>
     </AuthProvider>
   )

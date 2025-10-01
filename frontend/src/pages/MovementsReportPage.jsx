@@ -68,28 +68,42 @@ const MovementsReportPage = () => {
             return;
         }
 
-        // 2. Formatear los datos usando los nombres de campo correctos
-        const dataForExcel = movements.map(mov => ({
-            "Fecha y Hora": new Date(mov.date._seconds * 1000).toLocaleString("es-CL"),
-            // Corrección: Acceder a los datos dentro de 'productInfo'
-            "SKU": mov.productInfo?.sku || "N/A",
-            "Producto": mov.productInfo?.nombre || "Sin Nombre",
-            "Tipo": mov.type,
-            "Cantidad": mov.quantity,
-            "Motivo": mov.reason,
-            // Corrección: Usar 'userName' en lugar de 'userEmail'
-            "Usuario": mov.userName || "Desconocido",
-            "Observaciones": mov.observaciones || ""
-        }));
+        setIsExporting(true); // Opcional: para mostrar un spinner mientras se genera
 
-        // 3. Crear y descargar el archivo Excel
-        const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte de Movimientos");
-        XLSX.writeFile(workbook, `reporte_movimientos_${filters.startDate}_a_${filters.endDate}.xlsx`);
+        try {
+            // --- ✨ INICIO DE LA CORRECCIÓN ✨ ---
+            const dataForExcel = movements.map(mov => {
+                // Reutilizamos la misma lógica de la tabla para consistencia
+                const product = products.find(p => p.id === mov.productId);
+                const productInfo = mov.productInfo || product || {};
+
+                return {
+                    "Fecha y Hora": new Date(mov.date._seconds * 1000).toLocaleString("es-CL"),
+                    // Usamos los datos de 'productInfo'
+                    "SKU": productInfo.sku || "N/A",
+                    "Producto": productInfo.nombre || "Sin Nombre",
+                    "Tipo": mov.type,
+                    "Cantidad": mov.quantity,
+                    "Motivo": mov.reason,
+                    "Usuario": mov.userName || "Desconocido",
+                    "Observaciones": mov.observaciones || ""
+                };
+            });
+            // --- ✨ FIN DE LA CORRECCIÓN ✨ ---
+
+            const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte de Movimientos");
+            XLSX.writeFile(workbook, `reporte_movimientos_${filters.startDate}_a_${filters.endDate}.xlsx`);
+            toast.success("¡Reporte exportado exitosamente!");
+
+        } catch (error) {
+            console.error("Error al exportar:", error);
+            toast.error("No se pudo exportar el archivo.");
+        } finally {
+            setIsExporting(false);
+        }
     };
-    // --- FIN: FUNCIÓN DE EXPORTACIÓN CORREGIDA ---
-    // --- FIN: NUEVA FUNCIÓN DE EXPORTACIÓN ---
 
     const formatDate = (timestamp) => {
         if (!timestamp || typeof timestamp._seconds !== 'number') return "N/A";
@@ -166,6 +180,8 @@ const MovementsReportPage = () => {
                                 // --- ✨ INICIO DE LA CORRECCIÓN ✨ ---
                                 // La lógica ahora está DENTRO del map, donde tiene acceso a cada 'mov'.
                                 const product = products.find(p => p.id === mov.productId);
+
+                                // Damos prioridad a 'productInfo'. Si no existe, usamos la búsqueda antigua como respaldo.
                                 const productInfo = mov.productInfo || product || {};
                                 // --- ✨ FIN DE LA CORRECCIÓN ✨ ---
 

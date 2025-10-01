@@ -10,8 +10,8 @@ const AdminPage = () => {
 
     // Componente para las tarjetas de administración
     const AdminCard = ({ title, description, icon: Icon, color, action, disabled = false }) => (
-        <div 
-            onClick={!disabled ? action : undefined} 
+        <div
+            onClick={!disabled ? action : undefined}
             className={`bg-dark-card border border-dark-border p-6 rounded-lg transition-all duration-300 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10"}`}
         >
             <div className="flex items-start gap-4">
@@ -50,17 +50,17 @@ const AdminPage = () => {
                     icon={Users}
                     color="bg-gradient-to-r from-primary to-primary-dark"
                     action={() => navigate("/admin/usuarios")}
-                    disabled={false} 
+                    disabled={false}
                 />
                 {/* --- FIN DEL CÓDIGO CORREGIDO --- */}
-                
+
                 <AdminCard
                     title="Configuración del Sistema"
                     description="Parámetros generales, categorías y unidades de medida."
                     icon={Settings}
                     color="bg-gradient-to-r from-secondary to-blue-600"
-                    action={() => {}}
-                    disabled={true}
+                    action={() => navigate("/admin/configuracion")}
+                    disabled={false}
                 />
                 <AdminCard
                     title="Base de Datos"
@@ -79,9 +79,9 @@ const AdminPage = () => {
                     disabled={false}
                 />
             </div>
-            
+
             {/* ... (El resto del archivo puede quedar igual) ... */}
-            
+
         </div>
     );
 };

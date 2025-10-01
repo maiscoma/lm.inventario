@@ -157,17 +157,24 @@ const ProductsPage = () => {
     setIsMovementModalOpen(true); // El nombre correcto es setIsMovementModalOpen
   };
 
+  // --- INICIO DE LA CORRECCIÓN EN LA BÚSQUEDA ---
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const search = searchTerm.toLowerCase();
+
+      // Convertimos todos los campos a string antes de buscar para evitar errores.
+      // `|| ''` se asegura de que si el campo no existe, no cause un error.
       const matchesSearch =
-        product.nombre.toLowerCase().includes(search) ||
-        product.sku.toLowerCase().includes(search) ||
-        (product.categoria && product.categoria.toLowerCase().includes(search));
+        (product.nombre || '').toLowerCase().includes(search) ||
+        String(product.sku || '').toLowerCase().includes(search) ||
+        (product.categoria || '').toLowerCase().includes(search);
+
       const matchesCategory = !categoryFilter || product.categoria === categoryFilter;
+
       return matchesSearch && matchesCategory;
     });
   }, [products, searchTerm, categoryFilter]);
+  // --- FIN DE LA CORRECCIÓN EN LA BÚSQUEDA ---
 
   // const categories = useMemo(() => [...new Set(products.map((p) => p.categoria).filter(Boolean))], [products]);
 

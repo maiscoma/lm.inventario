@@ -4,10 +4,12 @@ import { useState, useEffect } from "react"
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext"
 import { Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react"
+import { useSettings } from "../contexts/SettingsContext";
 import LoadingSpinner from "../components/LoadingSpinner"
 
 const Login = () => {
   const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
+  const { settings } = useSettings();
   const location = useLocation()
 
   const [formData, setFormData] = useState({
@@ -89,9 +91,9 @@ const Login = () => {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="LM Labor Soft" className="w-20 h-20 object-contain" />
+            <img src="/logo.png" alt={settings.companyName} className="w-20 h-20 object-contain" />
           </div>
-          <h2 className="text-3xl font-bold gradient-text mb-2">LM Labor Soft</h2>
+          <h2 className="text-3xl font-bold gradient-text mb-2">{settings.companyName}</h2>
           <p className="text-text-secondary">Sistema de Inventario</p>
           <p className="text-sm text-text-muted mt-2">Inicia sesión para acceder al sistema</p>
         </div>
@@ -221,7 +223,7 @@ const Login = () => {
 
         {/* Footer */}
         <div className="text-center">
-          <p className="text-xs text-text-muted">© 2025 LM Labor Soft SpA. Todos los derechos reservados.</p>
+          <p className="text-xs text-text-muted">© 2025 {settings.companyName}. Todos los derechos reservados.</p>
         </div>
       </div>
     </div>

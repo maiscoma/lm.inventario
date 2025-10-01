@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
+import { useSettings } from "../contexts/SettingsContext";
 import {
   Home,
   Package,
@@ -23,6 +24,7 @@ import toast from "react-hot-toast"
 
 const Sidebar = () => {
   const { user, logout } = useAuth()
+  const { settings } = useSettings();
   const location = useLocation()
   const navigate = useNavigate()
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -160,7 +162,7 @@ const Sidebar = () => {
         {!isCollapsed && (
           <Link to="/dashboard" className="flex items-center gap-2">
             <img src="/logo.png" alt="LM Labor Soft" className="w-8 h-8 object-contain" />
-            <h2 className="text-lg font-bold gradient-text">LM Labor Soft</h2>
+            <h2 className="text-lg font-bold gradient-text">{settings.companyName}</h2>
           </Link>
         )}
         <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-2 rounded-lg hover:bg-dark-card transition-colors">

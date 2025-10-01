@@ -19,7 +19,7 @@ router.get("/", authenticate, requireAdmin, async (req, res) => {
 
 router.get("/export", authenticate, async (req, res) => {
     try {
-const snapshot = await db.collection("system_logs").orderBy("timestamp", "desc").get(); 
+        const snapshot = await db.collection("system_logs").orderBy("timestamp", "desc").get(); 
         const logs = snapshot.docs.map(doc => doc.data());
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet("Logs del Sistema");

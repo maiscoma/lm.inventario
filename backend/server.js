@@ -42,7 +42,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/logs", logsRoutes);
 app.use("/api/settings", settingsRoutes);
-app.use("/api/database", databaseRoutes);
+app.use('/api/database', databaseRoutes);
 
 
 // Ruta de salud del servidor
